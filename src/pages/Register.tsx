@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, ShoppingBag } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Mail, Lock, User, ShoppingBag, Gift } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter';
 
@@ -12,7 +12,10 @@ export function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-  
+
+  const [referral, setReferral] = useState('');
+  const location = useLocation();
+
   const navigate = useNavigate();
   const signUp = useAuthStore((state) => state.signUp);
 
@@ -20,13 +23,11 @@ export function Register() {
     e.preventDefault();
     setError('');
 
-    // Validate passwords match
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
-    // Check password strength
     if (passwordStrength < 3) {
       setError('Please choose a stronger password');
       return;
@@ -35,7 +36,7 @@ export function Register() {
     setLoading(true);
 
     try {
-      await signUp(email, password, name);
+      await signUp(email, password, name, referral);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'An error occurred during registration');
@@ -44,6 +45,11 @@ export function Register() {
     }
   };
 
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    setReferral(query.get('ref') || 'ULISHASTORE');
+  }, []);
+  
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-white flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -66,8 +72,26 @@ export function Register() {
               {error}
             </div>
           )}
-          
+
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {referral && (
+              <div>
+                <label htmlFor="referral" className="block text-sm font-medium text-gray-700">
+                  Referral Code
+                </label>
+                <div className="mt-1 relative">
+                  <input
+                    id="referral"
+                    type="text"
+                    value={referral}
+                    disabled
+                    className="pl-10 block w-full rounded-md border border-gray-300 px-3 py-2 bg-gray-100 text-gray-700 shadow-sm cursor-not-allowed"
+                  />
+                  <Gift className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                </div>
+              </div>
+            )}
+
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Full Name

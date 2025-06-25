@@ -6,7 +6,7 @@ interface AuthState {
   user: User | null;
   session: any;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName: string, referral: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   setUser: (user: User | null) => void;
@@ -19,14 +19,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   session: null,
   loading: false,
 
-  signUp: async (email: string, password: string, fullName: string) => {
+  signUp: async (email: string, password: string, fullName: string, referral: string) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            full_name: fullName
+            full_name: fullName,
+            referral: referral
           },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },

@@ -18,6 +18,7 @@ import { Returns } from './pages/Returns';
 import { useAuthStore } from './store/authStore';
 import { supabase } from './lib/supabase';
 import { InstallPWA } from './components/InstallPWA';
+import { Affiliate } from './pages/Affiliate';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((state) => state.user);
